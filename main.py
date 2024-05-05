@@ -18,7 +18,10 @@ def format_contents(contents: str) -> str: # форматировать соде
 def article_display(article: dict[str]) -> str: # отображение словарной статьи с источником
 	assert set(article.keys()) == {"contents", "source"}, ValueError(f"Невалидная словарная статья: {article}")
 	contents, source = article["contents"], article["source"]
-	return format_contents(contents) + "\n    ~ " + source
+	if source == "dictionaries/sa-ru-antonova.dsl": name = "Саамско-русский словарь. Автор Антонова А.А."
+	if source == "dictionaries/sa-ru-kert.dsl": name = "Саамско-русский словарь. Автор Керт Г.М."
+	if source == "dictionaries/sa-ru-kuruch.dsl": name = "Саамско-русский словарь. Под ред. Куруч Р.Д."
+	return format_contents(contents) + "\n    ~ " + name
 
 text = input()
 if text in full_dict:
