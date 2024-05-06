@@ -1,18 +1,14 @@
 # считываю json
 # считываю csv
 #with open...
-    
-#скрытая функция: принимает строчку и константу, ограничиваем количество итераций
-# кортеж из слова+вес_ош, если слово существует, если нет, всё равно применяем функцию
-#groups = [в желаемом виде]
+
 mix_ups = [
     (["э"], ["ы"]),
     (["н", "ҍ"], ["н", "ь"]),
     (["д", "т"], ["д"])
 ]
 
-def results_of_mixup (input_word: str, mix_up: tuple[list, list]):
-    wrong_str = ''
+def __results_of_mixup(input_word: str, mix_up: tuple[list, list]):
     list_of_mistakes = []
     length = len(mix_up[1])
     for index in range (len(input_word)):
@@ -28,4 +24,6 @@ def results_of_mixup (input_word: str, mix_up: tuple[list, list]):
         new_word = prefix + "".join(mix_up[0]) + suffix
         list_of_mistakes.append(new_word)
     return (list_of_mistakes)
-print (results_of_mixup("адыньны", mix_ups[0]))
+
+if __name__ == "__main__":
+    print (__results_of_mixup("адыньны", mix_ups[0]))
