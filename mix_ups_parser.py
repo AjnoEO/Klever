@@ -1,14 +1,17 @@
-# считываю json
-# считываю csv
-#with open...
+import json
+with open('klever_dict.json', encoding='utf8') as f:
+    dict_words = json.load(f)
+    dict_words = dict_words.keys()
 
+# считываю mix_ups/groups.json
+# считываю mix_ups.csv
 mix_ups = [
     (["э"], ["ы"]),
     (["н", "ҍ"], ["н", "ь"]),
     (["д", "т"], ["д"])
 ]
 
-def __results_of_mixup(input_word: str, mix_up: tuple[list, list]):
+def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
     list_of_mistakes = []
     length = len(mix_up[1])
     for index in range (len(input_word)):
@@ -23,7 +26,15 @@ def __results_of_mixup(input_word: str, mix_up: tuple[list, list]):
         suffix = input_word[index+length:]
         new_word = prefix + "".join(mix_up[0]) + suffix
         list_of_mistakes.append(new_word)
-    return (list_of_mistakes)
+    return list_of_mistakes
+
+def possible_words_from_input_word(input_word):
+    list_of_possible_words = []
+    for dict_word in dict_words:
+        if input_word in dict_word:
+            list_of_possible_words.append(dict_word)
+    return list_of_possible_words
 
 if __name__ == "__main__":
-    print (__results_of_mixup("адыньны", mix_ups[0]))
+    print(__results_of_mixup("адыньны", mix_ups[0]))
+    print(possible_words_from_input_word("хозь"))
