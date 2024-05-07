@@ -9,7 +9,7 @@ class MyCheckboxFrame(customtkinter.CTkFrame):
         self.checkbox_1 = customtkinter.CTkCheckBox(self, text="поспать")
         self.checkbox_1.grid(row=0, column=0, padx=10, pady=10, sticky="w")
         self.checkbox_2 = customtkinter.CTkCheckBox(self, text="поботать")
-        self.checkbox_2.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self.checkbox_2.grid(row=0, column=1, padx=10, pady=10, sticky="w")
 
 
     def get(self):
@@ -25,12 +25,38 @@ class sel_dict(customtkinter.CTkFrame):
         super().__init__(master, **kwargs)
 
         ##self.minsize("100x100")
-        self.grid_columnconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), weight=1)
-        self.grid_rowconfigure((1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), weight=1)
+        self.grid_columnconfigure((0, 1, 2), weight=1)
+        self.grid_rowconfigure((0, 1, 2,), weight=1)
         ##self.state('zoomed')
 
+        self.textbox = cus_ext.CTkPrettyTextbox(self)
+        self.textbox.grid(row=0, column=0, columnspan=3, sticky="nesw", padx=10, pady=10)
+        textbox_contents = [cus_ext.FormattedString("Искать в словарях... (надо бы ко всем словарям ещё иконки картинками повставлять -- раз уж все так привыкли к тому что \"Надо проверить долготу в красном словаре\")")]
+        self.textbox.force_edit(textbox_contents)
+
         self.checkbox_frame = MyCheckboxFrame(self)
-        self.checkbox_frame.grid(row=0, column=0, sticky="nsw")
+        self.checkbox_frame.grid(row=1, column=0, columnspan=3, sticky="nsw")
+
+        def button_event1():
+            checked_checkboxes = []
+
+        self.button = customtkinter.CTkButton(self, text="сбросить всё", command=button_event1())
+        self.button.grid(row=2, column=0, sticky="nesw", padx=10, pady=10)
+
+        def button_event2():
+            print("пользователь чё-то нажал")
+
+        self.button = customtkinter.CTkButton(self, text="какая-то ещё полезная кнопка, какая -- забыл", command=button_event2())
+        self.button.grid(row=2, column=1, sticky="nesw", padx=10, pady=10)
+
+
+
+        ##def radiobutton_event():
+            ##print("radiobutton toggled, current value:", radio_var.get())
+
+        ##self.radio_var = tkinter.IntVar(value=0)
+        ##radiobutton_1 = customtkinter.CTkRadioButton(App, text="CTkRadioButton 1", command=radiobutton_event, variable=radio_var, value=1)
+        ##radiobutton_2 = customtkinter.CTkRadioButton(App, text="CTkRadioButton 2", command=radiobutton_event, variable=radio_var, value=2)
 
 class App(customtkinter.CTk):
     customtkinter.set_default_color_theme("style.json")
@@ -76,11 +102,19 @@ class App(customtkinter.CTk):
         self.textbox.force_edit(textbox_contents)
 
         ##четвёртый текстбокс
-        self.textbox = cus_ext.CTkPrettyTextbox(self)
-        self.textbox.grid(row=1, column=1, columnspan=6, sticky="nesw", padx=10, pady=10)
-        textbox_contents = [cus_ext.FormattedString("Тут будет поисковая строка")]
-        self.textbox.force_edit(textbox_contents)
+        ##self.textbox = cus_ext.CTkPrettyTextbox(self)
+        ##self.textbox.grid(row=1, column=1, columnspan=6, sticky="nesw", padx=10, pady=10)
+        ##textbox_contents = [cus_ext.FormattedString("Тут будет поисковая строка")]
+        ##self.textbox.force_edit(textbox_contents)
+        tk_textbox = customtkinter.CTkTextbox(self, activate_scrollbars=False)
+        tk_textbox.grid(row=1, column=1, sticky="nsew", columnspan=6, padx=10, pady=10)
 
+        # create CTk scrollbar
+        ctk_textbox_scrollbar = customtkinter.CTkScrollbar(self, command=tk_textbox.xview)
+        ctk_textbox_scrollbar.grid(row=1, column=1, sticky="nesw")
+
+        # connect textbox scroll event to CTk scrollbar
+        tk_textbox.configure(xscrollcommand=ctk_textbox_scrollbar.set)
         ##пятый текстбокс
         self.textbox = cus_ext.CTkPrettyTextbox(self)
         self.textbox.grid(row=1, column=7, columnspan=5, sticky="nesw", padx=10, pady=10)

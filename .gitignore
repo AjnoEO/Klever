@@ -7,3 +7,4 @@ __pycache__
 klever_dict.json
 
 # Локальные программы для тестирования
+test.py
