@@ -55,10 +55,14 @@ class Formatter:
 		self.text: customtkinter.CTkTextbox = master
 
 		self.tag_list = ["bold", "italic", "underline", "overstrike"]
-		self.text.tag_config("bold", font=customtkinter.CTkFont(weight='bold'))
-		#self.text.tag_config("bold", font=(customtkinter.ThemeManager.theme["CTkFont"]["family"], customtkinter.ThemeManager.theme["CTkFont"]["size"], "bold"))
-		self.text.tag_config("italic", font=customtkinter.CTkFont(slant='italic'))
-		#self.text.tag_config("italic", font=(customtkinter.ThemeManager.theme["CTkFont"]["family"], customtkinter.ThemeManager.theme["CTkFont"]["size"], "italic"))
+		
+		self.font_family = self.text._font._family
+		self.font_size = self.text._font._size
+		#self.text.tag_config("bold", font=customtkinter.CTkFont(weight='bold'))
+		self.text.tag_config("bold", font=(self.font_family, self.font_size, "bold"))
+		#self.text.tag_config("italic", font=customtkinter.CTkFont(slant='italic'))
+		self.text.tag_config("italic", font=(self.font_family, self.font_size, "italic"))
+		
 		self.text.tag_config("underline", underline=1)
 		self.text.tag_config("overstrike", overstrike=1)
 	
@@ -84,6 +88,7 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
 	"""
 	def __init__(self, master: any, **kwargs):
 		super().__init__(master, **kwargs)
+		self.configure(wrap=customtkinter.WORD)
 		self.configure(state=customtkinter.DISABLED)
 	
 	def tag_config(self, tagName, **kwargs):
@@ -108,10 +113,10 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
 
 	def _pretty_insert(self, index: str, text: list[FormattedString], tags: None = None):
 		index = index.lower()
-		for chars in text:
-			self.insert(index, chars.string, (self.linker.add(chars.on_click) if chars.on_click else ()) + self.formatter.add(chars.color, chars.formatting) + (tags if tags else ()))
+		for substring in text:
+			self.insert(index, substring.string, (self.linker.add(substring.on_click) if substring.on_click else ()) + self.formatter.add(substring.color, substring.formatting) + (tags if tags else ()))
 			if not index.endswith("end"):
-				index += f" + {len(chars.string)} chars"
+				index += f" + {len(substring.string)} chars"
 
 def __main() -> None:
 	def theme_switcher():
@@ -130,20 +135,16 @@ def __main() -> None:
 	pretty_textbox = CTkPrettyTextbox(app)
 	pretty_textbox.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 	
-	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b]че̄ххч ли аббрай[/b] осень дождлива[/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
+	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b]че̄ххч ли аббрай[/b] осень дождлива[/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n\t[m1][b][c]аббрай[/c][/b] см. [b][ref]АББЬР[/ref][/b][/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
 
-	pretty_text = parse_dsl(test_string)
-	#pretty_text.append(FormattedString("Тестируем поле текста\n"))
-	#pretty_text.append(FormattedString("Этот текст должен быть синим\n", color="dark blue"))
-	#pretty_text.append(FormattedString(
-	#	"Этот текст должен быть зелёным и подчёркнутым\n", 
-	#	color="Dark green",
-	#	formatting=Formatting.UNDERLINE))
-	#pretty_text.append(FormattedString("Этот текст должен переключать тему\n", on_click=theme_switcher))
+	pretty_text = parse_dsl(test_string, on_click=__on_click)
 
 	pretty_textbox.force_edit(pretty_text)
 
 	app.mainloop()
+
+def __on_click(text: str):
+	print(f"REF-ссылка: {text}")
 
 if __name__ == "__main__":
 	__main()

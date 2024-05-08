@@ -1,6 +1,7 @@
 from customtkinter_formatting_manager import Formatting, FormattedString
 from typing import Callable
 import re
+import inspect
 
 def __split_dsl_to_tagged_list(string: str, lstrip: bool = True, rstrip: bool = True) -> list[tuple[str, list[tuple[str, str]]]]:
 	"""Разбивает строку с тэгами DSL на список кортежей. Каждый кортеж — строка символов + список тэгов в виде кортежа (тэг, аргументы тэга)
@@ -55,7 +56,7 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 	for substring, tags in splitted_string:
 		color = None
 		formatting = Formatting.NONE
-		previous_tag = None
+		on_click_action = None
 		for tag, tag_arguments in tags:
 			tag_arguments = tag_arguments.lstrip()
 			match tag:
@@ -74,16 +75,24 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 					formatting |= Formatting.BOLD
 				case 'i':
 					formatting |= Formatting.ITALIC
+				case 'ref':
+					if on_click:
+						sig = inspect.signature(on_click)
+						num_of_parameters = len(sig.parameters)
+						if num_of_parameters == 1:
+							def on_click_action():
+								on_click(substring)
+						else:
+							on_click_action = on_click
 				case _:
 					raise ValueError(f"Unknown tag: {tag}")
-		formatted_substring = FormattedString(substring, color = color, formatting = formatting)
+		formatted_substring = FormattedString(substring, color=color, formatting=formatting, on_click=on_click_action)
 		list_of_formatted_strings.append(formatted_substring)
 	return list_of_formatted_strings
 
 def main():
-	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b]че̄ххч ли аббрай[/b] осень дождлива[/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
-	print(__split_dsl_to_tagged_list(test_string))
-	print(parse_dsl(test_string))
+	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b][ref]че̄ххч[/ref] ли аббрай[/b] осень дождлива[/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
+	print(parse_dsl(test_string, on_click=lambda text: print(f"REF-ссылка: <{text}>")))
 
 if __name__ == "__main__":
 	main()
