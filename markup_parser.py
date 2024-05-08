@@ -2,6 +2,7 @@ from customtkinter_formatting_manager import Formatting, FormattedString
 from typing import Callable
 import re
 import inspect
+from utils import apply_arguments
 
 def __split_dsl_to_tagged_list(string: str, lstrip: bool = True, rstrip: bool = True) -> list[tuple[str, list[tuple[str, str]]]]:
 	"""Разбивает строку с тэгами DSL на список кортежей. Каждый кортеж — строка символов + список тэгов в виде кортежа (тэг, аргументы тэга)
@@ -52,7 +53,7 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 	:rtype: list[FormattedString]
 	"""
 	splitted_string = __split_dsl_to_tagged_list(string)
-	list_of_formatted_strings = []
+	list_of_formatted_strings: list[FormattedString] = []
 	for substring, tags in splitted_string:
 		color = None
 		formatting = Formatting.NONE
@@ -80,8 +81,7 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 						sig = inspect.signature(on_click)
 						num_of_parameters = len(sig.parameters)
 						if num_of_parameters == 1:
-							def on_click_action():
-								on_click(substring)
+							on_click_action = apply_arguments(on_click, substring)
 						else:
 							on_click_action = on_click
 				case _:
