@@ -1,4 +1,7 @@
 import json
+
+MAX_WEIGHT = 5
+
 with open('klever_dict.json', encoding='utf8') as f:
     dict_words = json.load(f)
     dict_words = dict_words.keys()
@@ -10,6 +13,9 @@ mix_ups = [
     (["н", "ҍ"], ["н", "ь"]),
     (["д", "т"], ["д"])
 ]
+
+#для тестировки можно использовать test_dict_keys с посылкой "адынд"
+test_dict_keys = ["адынд", "адындт", "адэнд", "адтэндт", "эдтынд", "адтынд", "адтындт" ]
 
 def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
     list_of_mistakes = []
@@ -28,13 +34,24 @@ def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
         list_of_mistakes.append(new_word)
     return list_of_mistakes
 
+def apply_mixups(input_word: str, weight: int=0) -> dict[str, int]:
+    main_dict = {}
+    if input_word in dict_words:
+        main_dict[input_word] = weight
+    if weight > MAX_WEIGHT:
+        return main_dict
+    for mix_up in mix_ups:
+        list_of_mistakes = __results_of_mixup(input_word, mix_up)
+        for mistaken_word in list_of_mistakes:
+            aux_dict = apply_mixups(mistaken_word, weight+1)
+            main_dict = aux_dict | main_dict
+    return main_dict
+
 def possible_words_from_input_word(input_word):
-    list_of_possible_words = []
-    for dict_word in dict_words:
-        if input_word in dict_word:
-            list_of_possible_words.append(dict_word)
+    main_dict = apply_mixups(input_word)
+    sorted_main_dict = dict(sorted(main_dict.items(), key = lambda x:(x[1], x[0])))
+    list_of_possible_words = list(sorted_main_dict.keys())
     return list_of_possible_words
 
 if __name__ == "__main__":
-    print(__results_of_mixup("адыньны", mix_ups[0]))
-    print(possible_words_from_input_word("хозь"))
+    print (possible_words_from_input_word(input()))
