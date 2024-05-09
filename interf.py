@@ -31,23 +31,22 @@ class sel_dict(customtkinter.CTkFrame):
 
         self.textbox = cus_ext.CTkPrettyTextbox(self)
         self.textbox.grid(row=0, column=0, columnspan=3, sticky="nesw", padx=10, pady=10)
-        textbox_contents = [cus_ext.FormattedString("Искать в словарях... (надо бы ко всем словарям ещё иконки картинками повставлять -- раз уж все так привыкли к тому что \"Надо проверить долготу в красном словаре\")")]
+        textbox_contents = [cus_ext.FormattedString("Всё что внутри фиолетового -- нерабочая шняга")]
         self.textbox.force_edit(textbox_contents)
 
         self.checkbox_frame = MyCheckboxFrame(self)
         self.checkbox_frame.grid(row=1, column=0, columnspan=3, sticky="nsw")
 
-        def button_event1():
-            checked_checkboxes = []
+        self.button1 = customtkinter.CTkButton(self, text="сбросить всё", command=self.button_event1)
+        self.button1.grid(row=2, column=0, sticky="nesw", padx=10, pady=10)
 
-        self.button = customtkinter.CTkButton(self, text="сбросить всё", command=button_event1())
-        self.button.grid(row=2, column=0, sticky="nesw", padx=10, pady=10)
+        self.button2 = customtkinter.CTkButton(self, text="какая-то ещё полезная кнопка, какая -- забыл", command=self.button_event2)
+        self.button2.grid(row=2, column=1, sticky="nesw", padx=10, pady=10)
+    def button_event2(self):
+        print("пользователь чё-то нажал")
+    def button_event1(self):
+        checked_checkboxes = []
 
-        def button_event2():
-            print("пользователь чё-то нажал")
-
-        self.button = customtkinter.CTkButton(self, text="какая-то ещё полезная кнопка, какая -- забыл", command=button_event2())
-        self.button.grid(row=2, column=1, sticky="nesw", padx=10, pady=10)
 
 
 
@@ -69,8 +68,8 @@ class App(customtkinter.CTk):
         self.title("жоско умный словарь")
         self.geometry("700x500")
         ##self.minsize("100x100")
-        self.grid_columnconfigure((2, 3, 4, 5, 8, 9, 10, 11), weight=1)
-        self.grid_rowconfigure((3, 4, 5, 6, 7, 8, 9, 10, 11), weight=1)
+        self.grid_columnconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), weight=1)
+        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), weight=1)
         ##self.state('zoomed')
         self.after(0, lambda: self.state('zoomed'))
 
@@ -80,6 +79,7 @@ class App(customtkinter.CTk):
 
         self.sel_dict = sel_dict(self)
         self.sel_dict.grid(row=0, column=0, columnspan=6, sticky="nsew", padx=10, pady=10)
+        ##self.sel_dict.configure(maxheight=200)
 
 
 
@@ -106,15 +106,15 @@ class App(customtkinter.CTk):
         ##self.textbox.grid(row=1, column=1, columnspan=6, sticky="nesw", padx=10, pady=10)
         ##textbox_contents = [cus_ext.FormattedString("Тут будет поисковая строка")]
         ##self.textbox.force_edit(textbox_contents)
-        tk_textbox = customtkinter.CTkTextbox(self, activate_scrollbars=False)
-        tk_textbox.grid(row=1, column=1, sticky="nsew", columnspan=6, padx=10, pady=10)
+        ##tk_textbox = customtkinter.CTkTextbox(self, activate_scrollbars=False)
+        ##tk_textbox.grid(row=1, column=1, sticky="nsew", columnspan=6, padx=10, pady=10)
 
-        # create CTk scrollbar
-        ctk_textbox_scrollbar = customtkinter.CTkScrollbar(self, command=tk_textbox.xview)
-        ctk_textbox_scrollbar.grid(row=1, column=1, sticky="nesw")
+        self.entry = customtkinter.CTkEntry(self, placeholder_text="что поищем в этот раз?")
+        self.entry.grid(row=1, column=1, sticky="nsew", columnspan=6, padx=(10, 200), pady=(10, 200))
 
-        # connect textbox scroll event to CTk scrollbar
-        tk_textbox.configure(xscrollcommand=ctk_textbox_scrollbar.set)
+        self.button_search = customtkinter.CTkButton(self, text="Искать!", command=self.button_search_event)
+        self.button_search.grid(row=1, column=1, sticky="nsew", columnspan=6, padx=(200, 10), pady=(200, 10))
+
         ##пятый текстбокс
         self.textbox = cus_ext.CTkPrettyTextbox(self)
         self.textbox.grid(row=1, column=7, columnspan=5, sticky="nesw", padx=10, pady=10)
@@ -138,6 +138,8 @@ class App(customtkinter.CTk):
 
         ##self.progressbar = customtkinter.CTkProgressBar(self, orientation="horizontal")
 
+    def button_search_event(self):
+        print(self.entry.get())
     ##def button_callback(self):
         ##print("чё-то происходит!")
         ##print("checked checkboxes:", self.checkbox_frame.get())
