@@ -23,9 +23,9 @@ def article_display(article: dict[str]) -> str: # отображение сло�
 	if source == "dictionaries/sa-ru-kuruch.dsl": name = "Саамско-русский словарь. Под ред. Куруч Р.Д."
 	return format_contents(contents) + "\n    ~ " + name
 
-text = input()
-if text in full_dict:
-	for article in full_dict[text]:
-		print(article_display(article))
-else:
-	print(f"Нет результатов для слова «{text}»")
+##text = input()
+##if text in full_dict:
+	##for article in full_dict[text]:
+		##print(article_display(article))
+##else:
+	##print(f"Нет результатов для слова «{text}»")
