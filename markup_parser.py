@@ -36,11 +36,53 @@ def __split_dsl_to_tagged_list(string: str, lstrip: bool = True, rstrip: bool = 
 		parsed_internal = [(s, tags + [(tag, tag_attribute)])] + parsed_internal[1:]
 	else:
 		parsed_internal = [(s, tags + [(tag, tag_attribute)]) for s, tags in parsed_internal]
-	parsed_suffix = __split_dsl_to_tagged_list(suffix, lstrip=False)
+	if suffix != "" and suffix[0] == "\n":
+		parsed_suffix = [("\n", [])] + __split_dsl_to_tagged_list(suffix)
+	else:
+		parsed_suffix = __split_dsl_to_tagged_list(suffix, lstrip=False)
 	list_of_tagged_strings = (parsed_prefix if prefix != "" else []) \
 		+ parsed_internal \
 		+ (parsed_suffix if suffix != "" else [])
 	return list_of_tagged_strings
+
+def __adapt_on_click_func(on_click: Callable[[str], None] | Callable[[], None] | None, substring: str):
+	if not on_click:
+		return None
+	sig = inspect.signature(on_click)
+	num_of_parameters = len(sig.parameters)
+	if num_of_parameters == 1:
+		return apply_arguments(on_click, substring)
+	else:
+		return on_click
+
+def __parse_dsl_tag(
+		substring: str,
+		tag: str, 
+		tag_arguments: str, 
+		tag_info: dict[str], 
+		on_click: Callable[[str], None] | Callable[[], None] | None
+		) -> dict[str]:
+	match tag:
+		case 'c':
+			if tag_arguments == '':
+				tag_info["color"] = "Green"
+			else:
+				tag_info["color"] = tag_arguments
+		case 'm':
+			if not tag_arguments.isnumeric():
+				raise ValueError(f"Invalid tag: {tag, tag_arguments}")
+			tag_info["tabs"] = int(tag_arguments)
+		case 'u':
+			tag_info["formatting"] |= Formatting.UNDERLINE
+		case 'b':
+			tag_info["formatting"] |= Formatting.BOLD
+		case 'i':
+			tag_info["formatting"] |= Formatting.ITALIC
+		case 'ref':
+			tag_info["on_click"] = __adapt_on_click_func(on_click, substring)
+		case _:
+			raise ValueError(f"Unknown tag: {tag}")
+	return tag_info
 
 def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] | None = None) -> list[FormattedString]:
 	"""Преобразовать строку формата DSL в `list[FormattedString]` с нужным форматированием
@@ -55,38 +97,21 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 	splitted_string = __split_dsl_to_tagged_list(string)
 	list_of_formatted_strings: list[FormattedString] = []
 	for substring, tags in splitted_string:
-		color = None
-		formatting = Formatting.NONE
-		on_click_action = None
+		tag_info = {
+			"color": None,
+			"formatting": Formatting.NONE,
+			"on_click": None
+		}
 		for tag, tag_arguments in tags:
 			tag_arguments = tag_arguments.lstrip()
-			match tag:
-				case 'c':
-					if tag_arguments == '':
-						color = "Green"
-					else:
-						color = tag_arguments
-				case 'm':
-					if not tag_arguments.isnumeric():
-						raise ValueError(f"Invalid tag: {tag, tag_arguments}")
-					list_of_formatted_strings.append(FormattedString('\t' * int(tag_arguments)))
-				case 'u':
-					formatting |= Formatting.UNDERLINE
-				case 'b':
-					formatting |= Formatting.BOLD
-				case 'i':
-					formatting |= Formatting.ITALIC
-				case 'ref':
-					if on_click:
-						sig = inspect.signature(on_click)
-						num_of_parameters = len(sig.parameters)
-						if num_of_parameters == 1:
-							on_click_action = apply_arguments(on_click, substring)
-						else:
-							on_click_action = on_click
-				case _:
-					raise ValueError(f"Unknown tag: {tag}")
-		formatted_substring = FormattedString(substring, color=color, formatting=formatting, on_click=on_click_action)
+			tag_info = __parse_dsl_tag(substring, tag, tag_arguments, tag_info, on_click)
+		if "tabs" in tag_info:
+			list_of_formatted_strings.append(FormattedString('\t' * tag_info["tabs"]))
+		formatted_substring = FormattedString(
+			substring, 
+			color=tag_info["color"], 
+			formatting=tag_info["formatting"], 
+			on_click=tag_info["on_click"])
 		list_of_formatted_strings.append(formatted_substring)
 	return list_of_formatted_strings
 

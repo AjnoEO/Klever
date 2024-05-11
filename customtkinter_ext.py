@@ -119,13 +119,6 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
 				index += f" + {len(substring.string)} chars"
 
 def __main() -> None:
-	def theme_switcher():
-		mode = customtkinter.get_appearance_mode()
-		match mode:
-			case "Light": new_mode = "Dark"
-			case "Dark": new_mode = "Light"
-		customtkinter.set_appearance_mode(new_mode)
-
 	app = customtkinter.CTk()
 	app.title("customtkinter_ext — тест")
 	app.geometry("500x500")
@@ -144,7 +137,7 @@ def __main() -> None:
 	app.mainloop()
 
 def __on_click(text: str):
-	print(f"REF-ссылка: {text}")
+	print(f"Нажата REF-ссылка: {text}")
 
 if __name__ == "__main__":
 	__main()
