@@ -51,7 +51,7 @@ def __adapt_on_click_func(on_click: Callable[[str], None] | Callable[[], None] |
 	sig = inspect.signature(on_click)
 	num_of_parameters = len(sig.parameters)
 	if num_of_parameters == 1:
-		return apply_arguments(on_click, substring)
+		return apply_arguments(on_click, substring.lower())
 	else:
 		return on_click
 
