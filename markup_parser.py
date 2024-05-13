@@ -118,7 +118,7 @@ def __parse_dsl_tag(
 		case 'i':
 			tag_info["formatting"] |= Formatting.ITALIC
 		case 'ref':
-			tag_info["on_click"] = __adapt_on_click_func(on_click, substring)
+			tag_info["on_click"] = __adapt_on_click_func(on_click, substring, substring_adapter)
 		case _:
 			raise ValueError(f"Unknown tag: {tag}")
 	return tag_info
@@ -143,7 +143,7 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 		}
 		for tag, tag_arguments in tags:
 			tag_arguments = tag_arguments.lstrip()
-			tag_info = __parse_dsl_tag(substring, tag, tag_arguments, tag_info, on_click, lambda string: re.sub(r"[ \d,]+^", string.lower()))
+			tag_info = __parse_dsl_tag(substring, tag, tag_arguments, tag_info, on_click, lambda string: re.sub(r"[ \d,]+^", "", string.lower()))
 		if "tabs" in tag_info:
 			list_of_formatted_strings.append(FormattedString('\t' * tag_info["tabs"]))
 		formatted_substring = FormattedString(
