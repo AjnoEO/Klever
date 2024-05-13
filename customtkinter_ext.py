@@ -128,7 +128,7 @@ def __main() -> None:
 	pretty_textbox = CTkPrettyTextbox(app)
 	pretty_textbox.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 	
-	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b]че̄ххч ли аббрай[/b] осень дождлива[/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n\t[m1][b][c]аббрай[/c][/b] см. [b][ref]АББЬР[/ref][/b][/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
+	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b]че̄ххч ли аббрай[/b] осень \[дождлива\][/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n\t[m1][b][c]аббрай[/c][/b] см. [b][ref]АББЬР[/ref][/b][/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
 
 	pretty_text = parse_dsl(test_string, on_click=__on_click)
 

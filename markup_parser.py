@@ -25,6 +25,9 @@ def __split_dsl_to_tagged_list(string: str, lstrip: bool = True, rstrip: bool = 
 			string = string.rstrip()
 		return [(string, [])]
 	prefix, tag, tag_attribute, internal, suffix = tag_match.groups()
+	prefix = prefix.replace("\\", "")
+	internal = internal.replace("\\", "")
+	suffix = suffix.replace("\\", "")
 	if lstrip:
 		prefix = prefix.lstrip()
 	if rstrip:
@@ -116,7 +119,7 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 	return list_of_formatted_strings
 
 def main():
-	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b][ref]че̄ххч[/ref] ли аббрай[/b] осень дождлива[/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
+	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b][ref]че̄ххч[/ref] ли аббрай[/b] осень \[дождлива\][/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
 	print(parse_dsl(test_string, on_click=lambda text: print(f"REF-ссылка: <{text}>")))
 
 if __name__ == "__main__":
