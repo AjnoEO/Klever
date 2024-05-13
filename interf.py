@@ -27,7 +27,7 @@ class Possible_words(customtkinter.CTkFrame):
             word_button.destroy()
         self.variants.clear()
         for i, word in enumerate(possible_word_list):
-            word_button = customtkinter.CTkButton(self, text=word, command=apply_arguments(self.display_article, word))
+            word_button = customtkinter.CTkButton(self, text=word, fg_color="#E7ECEF", hover_color="#E7ECEF", border_width=0, command=apply_arguments(self.display_article, word))
             word_button.grid(row=i+1, column=0, padx=10, pady=10, sticky="nesw")
             self.grid_rowconfigure((i+1), weight=0)
             self.variants.append(word_button)
@@ -36,6 +36,7 @@ class Possible_words(customtkinter.CTkFrame):
         textbox_contents = []
         for article in dictionaries[word]:
             textbox_contents += parse_dsl(article["contents"], self.display_article)
+            textbox_contents += parse_dsl(article["source"], self.display_article)
             textbox_contents += [cus_ext.FormattedString("\n")]
         self.master.textbox.force_edit(textbox_contents)
         print(word)
@@ -57,25 +58,29 @@ class App(customtkinter.CTk):
 
         ## варианты
         self.possible_words = Possible_words(self)
-        self.possible_words.grid(row=0, column=0, sticky="nesw", rowspan=2, padx=10, pady=10)
+        self.possible_words.grid(row=0, column=0, sticky="nesw", rowspan=2, padx=(20, 10), pady=20)
 
         ## строка поиска
         self.text_var = customtkinter.StringVar(value="")
 
         self.entry = customtkinter.CTkEntry(self, placeholder_text="что поищем в этот раз?")
-        self.entry.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+        self.entry.grid(row=0, column=1, sticky="nsew", padx=10, pady=(20, 10))
+        
 
         ## поисковые параметры
         self.button_search = customtkinter.CTkButton(self, text="искать!", command=self.button_search_event)
-        self.button_search.grid(row=0, column=2, sticky="nsew", padx=10, pady=10)
+        self.button_search.grid(row=0, column=2, sticky="nsew", padx=(10, 20), pady=(20, 10))
 
         ##вывод
         self.textbox = cus_ext.CTkPrettyTextbox(self)
-        self.textbox.grid(row=1, column=1, columnspan=11, rowspan=2, sticky="nesw", padx=10, pady=10)
+        self.textbox.grid(row=1, column=1, columnspan=11, rowspan=2, sticky="nesw", padx=(10, 20), pady=(10, 20))
 
     def button_search_event(self):
         self.res = possible_words_from_input_word(self.entry.get())
         self.possible_words.populate(self.res)
-        self.possible_words.display_article(self.entry.get())
+        if self.res != []:
+            self.possible_words.display_article(self.res[0])
+        else:
+            self.textbox.force_edit([])
 app = App()
 app.mainloop()

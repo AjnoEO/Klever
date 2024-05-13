@@ -7,7 +7,7 @@
     "fg_color": ["#CEC8E8", "gray10"]
   },
   "CTkFrame": {
-    "corner_radius": 6,
+    "corner_radius": 12,
     "border_width": 3,
     "fg_color": ["#E7ECEF"],
     "top_fg_color": ["#E8D7FF"],
