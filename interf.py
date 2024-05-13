@@ -1,8 +1,18 @@
+from convert_dict import convert
+
+list_of_dictionaries = ["dictionaries/sa-ru-antonova.dsl", "dictionaries/sa-ru-kert.dsl", "dictionaries/sa-ru-kuruch.dsl"]
+convert(list_of_dictionaries)
+
 import customtkinter
 import customtkinter_ext as cus_ext
 from mix_ups_parser import possible_words_from_input_word
 from utils import apply_arguments
-from convert_dict import convert
+import json
+from markup_parser import parse_dsl
+
+with open("klever_dict.json", encoding="utf8") as f:
+    dictionaries = json.load(f)
+
 
 class Possible_words(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -17,14 +27,16 @@ class Possible_words(customtkinter.CTkFrame):
             word_button.destroy()
         self.variants.clear()
         for i, word in enumerate(possible_word_list):
-            word_button = customtkinter.CTkButton(self, text=word, command=apply_arguments(self.article, word))
+            word_button = customtkinter.CTkButton(self, text=word, command=apply_arguments(self.display_article, word))
             word_button.grid(row=i+1, column=0, padx=10, pady=10, sticky="nesw")
             self.grid_rowconfigure((i+1), weight=0)
             self.variants.append(word_button)
-            print("самсинг из хеппенинг")
 
-    def article(self, word: str):
-        textbox_contents = [cus_ext.FormattedString(word)]
+    def display_article(self, word: str):
+        textbox_contents = []
+        for article in dictionaries[word]:
+            textbox_contents += parse_dsl(article["contents"], self.display_article)
+            textbox_contents += [cus_ext.FormattedString("\n")]
         self.master.textbox.force_edit(textbox_contents)
         print(word)
 
@@ -64,7 +76,6 @@ class App(customtkinter.CTk):
     def button_search_event(self):
         self.res = possible_words_from_input_word(self.entry.get())
         self.possible_words.populate(self.res)
-        self.possible_words.article(self.entry.get())
-
+        self.possible_words.display_article(self.entry.get())
 app = App()
 app.mainloop()
