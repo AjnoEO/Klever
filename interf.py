@@ -65,7 +65,7 @@ class App(customtkinter.CTk):
 
         self.entry = customtkinter.CTkEntry(self, placeholder_text="что поищем в этот раз?")
         self.entry.grid(row=0, column=1, sticky="nsew", padx=10, pady=(20, 10))
-        
+        self.entry.bind("<KeyPress-Return>", command=self.enter_pressed)
 
         ## поисковые параметры
         self.button_search = customtkinter.CTkButton(self, text="искать!", command=self.button_search_event)
@@ -76,11 +76,15 @@ class App(customtkinter.CTk):
         self.textbox.grid(row=1, column=1, columnspan=11, rowspan=2, sticky="nesw", padx=(10, 20), pady=(10, 20))
 
     def button_search_event(self):
-        self.res = possible_words_from_input_word(self.entry.get())
+        self.res = possible_words_from_input_word(self.entry.get().lower())
         self.possible_words.populate(self.res)
         if self.res != []:
             self.possible_words.display_article(self.res[0])
         else:
             self.textbox.force_edit([])
+
+    def enter_pressed(self, event):
+        self.button_search_event()
+
 app = App()
 app.mainloop()
