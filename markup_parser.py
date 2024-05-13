@@ -48,13 +48,31 @@ def __split_dsl_to_tagged_list(string: str, lstrip: bool = True, rstrip: bool = 
 		+ (parsed_suffix if suffix != "" else [])
 	return list_of_tagged_strings
 
-def __adapt_on_click_func(on_click: Callable[[str], None] | Callable[[], None] | None, substring: str):
+def __adapt_on_click_func(
+		on_click: Callable[[str], None] | Callable[[], None] | None,
+		substring: str,
+		substring_adapter: Callable[[str], str] | None = None
+		) -> Callable[[], None] | None:
+	"""Адаптировать функцию `on_click` для использования в ref-ссылке
+
+	:param on_click: Функция `on_click`
+	:type on_click: Callable[[str], None] | Callable[[], None] | None
+	:param substring: Строка в тэге [ref]
+	:type substring: str
+	:param substring_adapter: Функция адаптирующая строку в тэге для создания правильной ссылки, None по умолчанию
+	:type substring_adapter: Callable[[str], str] | None, optional
+	:return: Функция нужного вида
+	:rtype: Callable[[], None] | None
+	"""
 	if not on_click:
 		return None
 	sig = inspect.signature(on_click)
 	num_of_parameters = len(sig.parameters)
 	if num_of_parameters == 1:
-		return apply_arguments(on_click, substring.lower())
+		if substring_adapter:
+			return apply_arguments(on_click, substring_adapter(substring))
+		else:
+			return apply_arguments(on_click, substring)
 	else:
 		return on_click
 
@@ -63,8 +81,26 @@ def __parse_dsl_tag(
 		tag: str, 
 		tag_arguments: str, 
 		tag_info: dict[str], 
-		on_click: Callable[[str], None] | Callable[[], None] | None
+		on_click: Callable[[str], None] | Callable[[], None] | None,
+		substring_adapter: Callable[[str], str] | None = None
 		) -> dict[str]:
+	"""Парсит DSL-тэг и возвращает словарь информации с нужными изменениями
+
+	:param substring: Строка, заключённая в тэг
+	:type substring: str
+	:param tag: Тэг
+	:type tag: str
+	:param tag_arguments: Аргументы тэга
+	:type tag_arguments: str
+	:param tag_info: Начальный словарь информации
+	:type tag_info: dict[str]
+	:param on_click: Функция, выполняющаяся при нажатии на ref-ссылки
+	:type on_click: Callable[[str], None] | Callable[[], None] | None
+	:param substring_adapter: Функция адаптирующая строку в тэге для создания правильной ссылки, None по умолчанию
+	:type substring_adapter: Callable[[str], str] | None, optional
+	:return: Обновлённый словарь информации
+	:rtype: dict[str]
+	"""
 	match tag:
 		case 'c':
 			if tag_arguments == '':
@@ -107,7 +143,7 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 		}
 		for tag, tag_arguments in tags:
 			tag_arguments = tag_arguments.lstrip()
-			tag_info = __parse_dsl_tag(substring, tag, tag_arguments, tag_info, on_click)
+			tag_info = __parse_dsl_tag(substring, tag, tag_arguments, tag_info, on_click, lambda string: re.sub(r"[ \d,]+^", string.lower()))
 		if "tabs" in tag_info:
 			list_of_formatted_strings.append(FormattedString('\t' * tag_info["tabs"]))
 		formatted_substring = FormattedString(
@@ -119,7 +155,7 @@ def parse_dsl(string: str, on_click: Callable[[str], None] | Callable[[], None] 
 	return list_of_formatted_strings
 
 def main():
-	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b][ref]че̄ххч[/ref] ли аббрай[/b] осень \[дождлива\][/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
+	test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; [b][ref]че̄ххч 2[/ref] ли аббрай[/b] осень \[дождлива\][/m]\n\t[m0][c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n"
 	print(parse_dsl(test_string, on_click=lambda text: print(f"REF-ссылка: <{text}>")))
 
 if __name__ == "__main__":
