@@ -4,6 +4,8 @@ import re
 import inspect
 from utils import apply_arguments
 
+TITLE_COLOR = "#274C77"
+
 def __split_dsl_to_tagged_list(string: str, lstrip: bool = True, rstrip: bool = True) -> list[tuple[str, list[tuple[str, str]]]]:
 	"""Разбивает строку с тэгами DSL на список кортежей. Каждый кортеж — строка символов + список тэгов в виде кортежа (тэг, аргументы тэга)
 
@@ -104,7 +106,7 @@ def __parse_dsl_tag(
 	match tag:
 		case 'c':
 			if tag_arguments == '':
-				tag_info["color"] = "Green"
+				tag_info["color"] = TITLE_COLOR
 			else:
 				tag_info["color"] = tag_arguments
 		case 'm':

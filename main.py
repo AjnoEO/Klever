@@ -13,6 +13,9 @@ from markup_parser import parse_dsl
 with open("klever_dict.json", encoding="utf8") as f:
     dictionaries = json.load(f)
 
+with open("info_about_dict.txt", encoding="utf8") as f:
+    info_a = f.read()
+
 class Possible_words(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -38,7 +41,7 @@ class Possible_words(customtkinter.CTkFrame):
             textbox_contents += parse_dsl(article["source"], self.display_article)
             textbox_contents += [cus_ext.FormattedString("\n")]
         self.master.textbox.force_edit(textbox_contents)
-        print(word)
+        ##print(word)
 
 class Win_about(customtkinter.CTkToplevel):
     def __init__(self, master):
@@ -49,11 +52,12 @@ class Win_about(customtkinter.CTkToplevel):
         self.geometry("700x500")
         self.grid_columnconfigure((0), weight=1)
         self.grid_rowconfigure((0), weight=1)
+        self.minsize(700, 500)
 
-        ##вывод
+        ##информация о словаре
         self.info_about = cus_ext.CTkPrettyTextbox(self)
         self.info_about.grid(row=0, column=0, sticky="nesw", padx=20, pady=20)
-        self.info_about.force_edit([cus_ext.FormattedString("Вы и так знаете, как польззоваться словарём")])
+        self.info_about.force_edit([cus_ext.FormattedString(info_a)])
 
 class App(customtkinter.CTk):
     customtkinter.set_default_color_theme("style.json")
@@ -68,14 +72,13 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure((1), weight=1)
         self.grid_rowconfigure((1), weight=1)
         self.after(0, lambda: self.state('zoomed'))
+        self.minsize(900, 500)
 
         ## варианты
         self.possible_words = Possible_words(self)
         self.possible_words.grid(row=0, column=0, sticky="nesw", rowspan=2, padx=(20, 10), pady=20)
 
         ## строка поиска
-        self.text_var = customtkinter.StringVar(value="")
-
         self.entry = customtkinter.CTkEntry(self, placeholder_text="введите услышанное")
         self.entry.grid(row=0, column=1, sticky="nsew", padx=10, pady=(20, 10))
         self.entry.bind("<KeyPress-Return>", command=self.enter_pressed)
@@ -101,7 +104,7 @@ class App(customtkinter.CTk):
         if self.res != []:
             self.possible_words.display_article(self.res[0])
         else:
-            self.textbox.force_edit([cus_ext.FormattedString("Скорее всего вы Вика и ищете несуществующее слово")])
+            self.textbox.force_edit([cus_ext.FormattedString("мы очень старались, но ничего похожего не нашлось :(")])
 
     def enter_pressed(self, event):
         self.button_search_event()
@@ -109,9 +112,7 @@ class App(customtkinter.CTk):
     def info(self, event):
         if self.win_info is None or not self.win_info.winfo_exists():
             self.win_info = Win_about(self)
-            self.win_info.focus()
-        ##else:
-        self.win_info.focus()
+        self.win_info.after(10, self.win_info.focus)
 
 app = App()
 app.mainloop()
