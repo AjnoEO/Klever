@@ -39,14 +39,18 @@ class Slot:
 
     def check_letter(self, letter):
         """проверка буквы на соответствие группе по типу"""
-        if letter in groups[self.type]:
-            return True
-        else:
-            return False
+        return letter in groups[self.type]
 
-    def segment_alternations(self):
-
-        return group
+    def segment_alternation(self):
+        """получаем список букв внутри группы"""
+        list_of_segments = groups[self.type]
+        if isinstance(list_of_segments[0], dict):
+            aux_set = set()
+            for segment_dict in list_of_segments:
+                for segment in segment_dict.values():
+                    aux_set.add(segment)
+            list_of_segments = list(aux_set)
+        return list_of_segments
 
 
 # считываю mix_ups/groups.json
@@ -57,18 +61,26 @@ mix_ups = [
     (["д", "т"], ["д"]),
     (["ы"], [Slot("гласный")]),
     ([Slot("гласный")], ["ы"]),
-    # ([согласный 1][1],[1])
+    ([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
 ]
 
 
-def __generate_possible_cores(segment_list) -> list[str]:
+
+def __generate_possible_cores(segment_list: list[str | Slot]) -> list[str]:
+    # итоговый список ядер
     possible_cores = []
     if segment_list == []:
         return [""]
-    aux_list = __generate_possible_cores(possible_cores[1:])
-
-
-print(__generate_possible_cores())
+    possible_second_parts = __generate_possible_cores(segment_list[1:])
+    if isinstance(segment_list[0], Slot):
+        possible_first_parts = segment_list[0].segment_alternation()
+    elif isinstance(segment_list[0], str):
+        possible_first_parts = [segment_list[0]]
+    for first_part in possible_first_parts:
+        for second_part in possible_second_parts:
+            possible_core = first_part + second_part
+            possible_cores.append(possible_core)
+    return possible_cores
 
 
 def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
@@ -122,4 +134,4 @@ def possible_words_from_input_word(input_word):
 
 
 if __name__ == "__main__":
-    print(possible_words_from_input_word(input()))
+    print(possible_words_from_input_word ("тынны"))
