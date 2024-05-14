@@ -9,6 +9,7 @@ klever_dict.json
 # Локальные программы для тестирования
 test.py
 for_testing.py
+about.py
 
 ## Более продвинутый макет интерфейса
 interf+.py
