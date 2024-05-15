@@ -55,7 +55,7 @@ class WinAbout(customtkinter.CTkToplevel):
 
         ## параметры окна
         self.title("О словаре")
-        self.geometry("700x500")
+        self.geometry("700x505")
         self.grid_columnconfigure((0), weight=1)
         self.grid_rowconfigure((0), weight=1)
         self.minsize(700, 500)
@@ -63,7 +63,7 @@ class WinAbout(customtkinter.CTkToplevel):
         ##информация о словаре
         self.info_about = cus_ext.CTkPrettyTextbox(self)
         self.info_about.grid(row=0, column=0, sticky="nesw", padx=20, pady=20)
-        self.info_about.force_edit([cus_ext.FormattedString(info_a)])
+        self.info_about.force_edit(parse_dsl(info_a))
 
 
 class App(customtkinter.CTk):
@@ -130,6 +130,17 @@ class App(customtkinter.CTk):
                 )
             ]
         )
+        self.after(10, self.find)
+
+    def enter_pressed(self, _=None):
+        self.button_search_event()
+
+    def info(self, _=None):
+        if self.win_info is None or not self.win_info.winfo_exists():
+            self.win_info = WinAbout(self)
+        self.win_info.after(10, self.win_info.focus)
+
+    def find(self, _=None):
         res = possible_words_from_input_word(self.entry.get().lower())
         self.possible_words.populate(res)
         if res:
@@ -138,27 +149,10 @@ class App(customtkinter.CTk):
             self.textbox.force_edit(
                 [
                     cus_ext.FormattedString(
-                        "мы очень старались, но ничего похожего не нашлось :("
+                        f"\"{self.entry.get().lower()}\" очень старалось, но в словарях не нашлось :("
                     )
                 ]
             )
-
-    def enter_pressed(self, _):
-        self.button_search_event()
-
-    def info(self, _):
-        if self.win_info is None or not self.win_info.winfo_exists():
-            self.win_info = WinAbout(self)
-        self.win_info.after(10, self.win_info.focus)
-
-    def info_waite(self, _):
-        self.textbox.force_edit(
-            [
-                cus_ext.FormattedString(
-                    "Дорогой пользователь, не пугайтесь! Ничего не сломалось, мы ищем ваши слова и путаемся..."
-                )
-            ]
-        )
 
 app = App()
 app.mainloop()

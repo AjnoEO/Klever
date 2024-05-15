@@ -16,7 +16,7 @@ class InlineLinker:
         self.text: customtkinter.CTkTextbox = master
 
         self.text.tag_config(
-            "link", 
+            "link",
             foreground = text_color,
             underline = 1 if Formatting.UNDERLINE in formatting else 0
         )
