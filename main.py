@@ -91,13 +91,15 @@ class App(customtkinter.CTk):
         ## строка поиска
         self.entry = customtkinter.CTkEntry(self, placeholder_text="введите услышанное")
         self.entry.grid(row=0, column=1, sticky="nsew", padx=10, pady=(20, 10))
-        self.entry.bind("<KeyPress-Return>", command=self.enter_pressed)
+        self.entry.bind("<KeyRelease-Return>", command=self.enter_pressed)
+        ##self.entry.bind("<KeyPress-Return>", command=self.info_waite)
 
         ## кнопка поиска
         self.button_search = customtkinter.CTkButton(
             self, text="искать!", command=self.button_search_event
         )
         self.button_search.grid(row=0, column=2, sticky="nsew", padx=10, pady=(20, 10))
+        ##self.button_search.bind("<Button>", command=self.info_waite)
 
         ## кнопка инфо
         self.button_info = customtkinter.CTkButton(self, text="о проекте")
@@ -121,6 +123,13 @@ class App(customtkinter.CTk):
         self.win_info = None
 
     def button_search_event(self):
+        self.textbox.force_edit(
+            [
+                cus_ext.FormattedString(
+                    "Дорогой пользователь, не пугайтесь! Ничего не сломалось, мы ищем ваши слова и путаемся..."
+                )
+            ]
+        )
         res = possible_words_from_input_word(self.entry.get().lower())
         self.possible_words.populate(res)
         if res:
@@ -142,6 +151,14 @@ class App(customtkinter.CTk):
             self.win_info = WinAbout(self)
         self.win_info.after(10, self.win_info.focus)
 
+    def info_waite(self, _):
+        self.textbox.force_edit(
+            [
+                cus_ext.FormattedString(
+                    "Дорогой пользователь, не пугайтесь! Ничего не сломалось, мы ищем ваши слова и путаемся..."
+                )
+            ]
+        )
 
 app = App()
 app.mainloop()
