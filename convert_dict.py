@@ -1,3 +1,5 @@
+"""Конвертировать словари в json нужного формата"""
+
 import json
 import re
 
@@ -6,7 +8,6 @@ def convert(list_of_dictionaries: list[dict]) -> None:
 	dict_words = {}
 	for dictionary in list_of_dictionaries:
 		with open(dictionary, "r", encoding='utf-16') as f:
-			source_data = dictionary
 			header = None
 			contents = ""
 			for line in f:
