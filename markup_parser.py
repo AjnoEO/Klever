@@ -8,7 +8,6 @@ from utils import apply_arguments
 
 TITLE_COLOR = "#274C77"
 
-
 def __split_dsl_to_tagged_list(
     string: str, lstrip: bool = True, rstrip: bool = True
 ) -> list[tuple[str, list[tuple[str, str]]]]:
