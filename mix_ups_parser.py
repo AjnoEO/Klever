@@ -2,6 +2,7 @@
 
 import json
 from convert_dict import convert
+from time import time
 
 MAX_WEIGHT = 5
 
@@ -14,11 +15,11 @@ convert(list_of_dictionaries)
 
 with open("klever_dict.json", encoding="utf8") as f:
     dict_words = json.load(f)
-    dict_words = dict_words.keys()
+    dict_words = set(dict_words.keys())
 
 groups = {
-    "гласный": ["а", "э", "я", "е", "ӓ", "ӭ", "ы", "о", "и"],
-    "согласный": ["п", "б", "м", "т", "д", "н"],
+    "гласный": {"а", "э", "я", "е", "ӓ", "ӭ", "ы", "о", "и"},
+    "согласный": {"п", "б", "м", "т", "д", "н"},
     "парный по звонкости": [
         {"глухой": "п", "звонкий": "б"},
         {"глухой": "т", "звонкий": "д"},
@@ -27,7 +28,7 @@ groups = {
         {"не йотированный": "а", "полуйотированный": "ӓ", "йотированный": "я"},
         {"не йотированный": "э", "полуйотированный": "ӭ", "йотированный": "е"},
     ],
-    "знак": ["ъ", "ь", "ҍ"],
+    "знак": {"ъ", "ь", "ҍ"},
 }
 
 
@@ -44,14 +45,18 @@ class Slot:
     def segment_alternation(self):
         """получаем список букв внутри группы"""
         list_of_segments = groups[self.type]
-        if isinstance(list_of_segments[0], dict):
+        if isinstance(list_of_segments, list):
             aux_set = set()
             for segment_dict in list_of_segments:
                 for segment in segment_dict.values():
                     aux_set.add(segment)
             list_of_segments = list(aux_set)
+        if self.id is not None:
+            list_of_segments = [global_mixup_dict[self.id]]
         return list_of_segments
 
+    def __str__(self) -> str:
+        return "Slot(" + self.type + ", " + str(self.id) + ")"
 
 # считываю mix_ups/groups.json
 # считываю mix_ups.csv
@@ -59,11 +64,10 @@ mix_ups = [
     (["э"], ["ы"]),
     (["н", "ҍ"], ["н", "ь"]),
     (["д", "т"], ["д"]),
-    (["ы"], [Slot("гласный")]),
     ([Slot("гласный")], ["ы"]),
+    ([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
     #([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
 ]
-
 
 
 def __generate_possible_cores(segment_list: list[str | Slot]) -> list[str]:
@@ -83,23 +87,37 @@ def __generate_possible_cores(segment_list: list[str | Slot]) -> list[str]:
     return possible_cores
 
 
+global_mixup_dict = {}
+
+
 def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
     list_of_mistakes = []
     length = len(mix_up[1])
     for index in range(len(input_word)):
+        global_mixup_dict.clear()
         is_match = True
         for mix_up_index in range(length):
+            if (index + mix_up_index) >= len(input_word):
+                is_match = False
+                break
+            current_letter = input_word[index + mix_up_index]
+            current_segment = mix_up[1][mix_up_index]
             if (
-                (index + mix_up_index) >= len(input_word)
-                or isinstance(mix_up[1][mix_up_index], str)
-                and input_word[index + mix_up_index] != mix_up[1][mix_up_index]
-                or isinstance(mix_up[1][mix_up_index], Slot)
-                and not mix_up[1][mix_up_index].check_letter(
-                    input_word[index + mix_up_index]
+                isinstance(current_segment, str)
+                and current_letter != current_segment
+                or isinstance(current_segment, Slot)
+                and not current_segment.check_letter(
+                    current_letter
                 )
             ):
                 is_match = False
                 break
+            if isinstance(current_segment, Slot) and current_segment.id is not None:
+                if current_segment.id not in global_mixup_dict:
+                    global_mixup_dict[current_segment.id] = current_letter
+                elif current_letter != global_mixup_dict[current_segment.id]:
+                    is_match = False
+                    break
         if not is_match:
             continue
         prefix = input_word[:index]
@@ -134,4 +152,7 @@ def possible_words_from_input_word(input_word):
 
 
 if __name__ == "__main__":
-    print(possible_words_from_input_word ("тынны"))
+    start_time = time()
+    print(possible_words_from_input_word ("тана"))
+    second_time = time()
+    print(second_time - start_time)
