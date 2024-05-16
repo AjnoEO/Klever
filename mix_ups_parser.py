@@ -19,7 +19,7 @@ with open("klever_dict.json", encoding="utf8") as f:
 
 groups = {
     "гласный": {"а", "э", "я", "е", "ӓ", "ӭ", "ы", "о", "и"},
-    "согласный": {"п", "б", "м", "т", "д", "н"},
+    "согласный": {"п", "б", "м", "т", "д", "н", "р"},
     "парный по звонкости": [
         {"глухой": "п", "звонкий": "б"},
         {"глухой": "т", "звонкий": "д"},
@@ -34,13 +34,19 @@ groups = {
 
 class Slot:
     """класс для слотов в путаницах"""
-    def __init__(self, letter_type: str, segment_id: int | None = None):
+    def __init__(self, letter_type: str, segment_id: int | None = None, feature: str | None = None):
         self.type = letter_type
         self.id = segment_id
+        self.feature = feature
 
     def check_letter(self, letter):
         """проверка буквы на соответствие группе по типу"""
-        return letter in groups[self.type]
+        if self.feature is None:
+            return letter in groups[self.type]
+        for feature_dict in groups[self.type]:
+            if feature_dict[self.feature] == letter:
+                return True
+        return False
 
     def segment_alternation(self):
         """получаем список букв внутри группы"""
@@ -51,22 +57,25 @@ class Slot:
                 for segment in segment_dict.values():
                     aux_set.add(segment)
             list_of_segments = list(aux_set)
-        if self.id is not None:
+        if (self.id is not None) and (self.feature is not None):
+            list_of_segments = [global_mixup_dict[self.id][self.feature]]
+        elif self.id is not None:
             list_of_segments = [global_mixup_dict[self.id]]
         return list_of_segments
 
     def __str__(self) -> str:
         return "Slot(" + self.type + ", " + str(self.id) + ")"
 
-# считываю mix_ups/groups.json
-# считываю mix_ups.csv
+
 mix_ups = [
     (["э"], ["ы"]),
     (["н", "ҍ"], ["н", "ь"]),
     (["д", "т"], ["д"]),
     ([Slot("гласный")], ["ы"]),
-    ([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
-    #([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
+    ([Slot("согласный", 1), Slot("согласный", 2)], [Slot("согласный", 2), Slot("согласный", 1)]),
+    ([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)]),
+    ([Slot("парный по звонкости", 1, "звонкий")], [Slot("парный по звонкости", 1, "глухой")])
+    #([Slot("согласный", "звонкий", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
 ]
 
 
@@ -106,14 +115,20 @@ def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
                 isinstance(current_segment, str)
                 and current_letter != current_segment
                 or isinstance(current_segment, Slot)
-                and not current_segment.check_letter(
-                    current_letter
-                )
+                and not current_segment.check_letter(current_letter)
             ):
                 is_match = False
                 break
             if isinstance(current_segment, Slot) and current_segment.id is not None:
-                if current_segment.id not in global_mixup_dict:
+                if current_segment.feature is not None:
+                    if current_segment.id not in global_mixup_dict:
+                        for feat_type_dict in groups[current_segment.type]:
+                            if feat_type_dict[current_segment.feature] == current_letter:
+                                global_mixup_dict[current_segment.id] = feat_type_dict
+                    elif global_mixup_dict[current_segment.id] != feat_type_dict:
+                        is_match = False
+                        break
+                elif current_segment.id not in global_mixup_dict:
                     global_mixup_dict[current_segment.id] = current_letter
                 elif current_letter != global_mixup_dict[current_segment.id]:
                     is_match = False
@@ -127,7 +142,6 @@ def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
             new_word = prefix + core + suffix
             list_of_mistakes.append(new_word)
     return list_of_mistakes
-
 
 def __apply_mixups(input_word: str, weight: int = 0) -> dict[str, int]:
     main_dict = {}
@@ -153,6 +167,6 @@ def possible_words_from_input_word(input_word):
 
 if __name__ == "__main__":
     start_time = time()
-    print(possible_words_from_input_word ("тана"))
+    print(possible_words_from_input_word (input()))
     second_time = time()
     print(second_time - start_time)
