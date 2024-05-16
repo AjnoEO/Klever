@@ -118,7 +118,9 @@ class PossibleWords(customtkinter.CTkFrame):
         textbox_contents = []
         for article in dictionaries[word]:
             textbox_contents += parse_dsl(article["contents"], self.display_article)
+            textbox_contents += [cus_ext.FormattedString("\n")]
             textbox_contents += parse_dsl(article["source"], self.display_article)
+            textbox_contents += [cus_ext.FormattedString("\n")]
             textbox_contents += [cus_ext.FormattedString("\n")]
         self.master.textbox.force_edit(textbox_contents)
 
@@ -141,6 +143,7 @@ class WinAbout(customtkinter.CTkToplevel):
 
 
 class App(customtkinter.CTk):
+    # customtkinter.FontManager.load_font("NunitoSans.ttf")
     customtkinter.set_default_color_theme("style.json")
 
     def __init__(self):
@@ -189,7 +192,7 @@ class App(customtkinter.CTk):
         self.after(10, self.find)
 
     def find(self, _=None):
-        res = possible_words_from_input_word(self.search_tools.what_enterred().lower())
+        res = possible_words_from_input_word(self.search_tools.what_enterred().lower().strip())
         self.possible_words.populate(res)
         if res:
             self.possible_words.display_article(res[0])
@@ -197,7 +200,7 @@ class App(customtkinter.CTk):
             self.textbox.force_edit(
                 [
                     cus_ext.FormattedString(
-                        f"\"{self.search_tools.what_enterred().lower()}\" очень старалось, но в словарях не нашлось :("
+                        f"\"{self.search_tools.what_enterred().lower().strip()}\" очень старалось, но в словарях не нашлось :("
                     )
                 ]
             )
