@@ -2,7 +2,6 @@
 
 import json
 from convert_dict import convert
-from time import time
 
 MAX_WEIGHT = 5
 
@@ -17,20 +16,11 @@ with open("klever_dict.json", encoding="utf8") as f:
     dict_words = json.load(f)
     dict_words = set(dict_words.keys())
 
-groups = {
-    "гласный": {"а", "э", "я", "е", "ӓ", "ӭ", "ы", "о", "и"},
-    "согласный": {"п", "б", "м", "т", "д", "н", "р"},
-    "парный по звонкости": [
-        {"глухой": "п", "звонкий": "б"},
-        {"глухой": "т", "звонкий": "д"},
-    ],
-    "тройственный по йотированности": [
-        {"не йотированный": "а", "полуйотированный": "ӓ", "йотированный": "я"},
-        {"не йотированный": "э", "полуйотированный": "ӭ", "йотированный": "е"},
-    ],
-    "знак": {"ъ", "ь", "ҍ"},
-}
-
+with open('mix_ups/groups.json', encoding='utf8') as f:
+    groups = json.load(f)
+    for type_gr in groups:
+        if isinstance(groups[type_gr][0], str):
+            groups[type_gr] = set(groups[type_gr])
 
 class Slot:
     """класс для слотов в путаницах"""
@@ -74,7 +64,7 @@ mix_ups = [
     ([Slot("гласный")], ["ы"]),
     ([Slot("согласный", 1), Slot("согласный", 2)], [Slot("согласный", 2), Slot("согласный", 1)]),
     ([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)]),
-    ([Slot("парный по звонкости", 1, "звонкий")], [Slot("парный по звонкости", 1, "глухой")])
+    ([Slot("парный по звонкости взрывной", 1, "звонкий")], [Slot("парный по звонкости взрывной", 1, "глухой")])
     #([Slot("согласный", "звонкий", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
 ]
 
@@ -166,7 +156,4 @@ def possible_words_from_input_word(input_word):
 
 
 if __name__ == "__main__":
-    start_time = time()
     print(possible_words_from_input_word (input()))
-    second_time = time()
-    print(second_time - start_time)
