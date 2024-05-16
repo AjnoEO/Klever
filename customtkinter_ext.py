@@ -60,13 +60,13 @@ class Formatter:
 
         self.font_family = self.text._font._family
         self.font_size = self.text._font._size
-        #self.text.tag_config("bold", font=customtkinter.CTkFont(weight='bold'))
-        self.text.tag_config("bold", font=(self.font_family, self.font_size, "bold"))
-        #self.text.tag_config("italic", font=customtkinter.CTkFont(slant='italic'))
-        self.text.tag_config("italic", font=(self.font_family, self.font_size, "italic"))
+        self.text.tag_config(str(Formatting.BOLD), font=customtkinter.CTkFont(weight='bold'))
+        #self.text.tag_config("bold", font=(self.font_family, self.font_size, "bold"))
+        self.text.tag_config(str(Formatting.ITALIC), font=customtkinter.CTkFont(slant='italic'))
+        #self.text.tag_config("italic", font=(self.font_family, self.font_size, "italic"))
 
-        self.text.tag_config("underline", underline=1)
-        self.text.tag_config("overstrike", overstrike=1)
+        self.text.tag_config(str(Formatting.UNDERLINE), underline=1)
+        self.text.tag_config(str(Formatting.OVERSTRIKE), overstrike=1)
 
     def add(self, color: str | None = None, formatting: Formatting | None = None) -> tuple[str]:
         """Создать нужные тэги форматирования и вернуть кортеж с ними
@@ -107,6 +107,7 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
             font = kwargs["font"]
             if isinstance(font, customtkinter.CTkFont):
                 font = self._apply_font_scaling(font)
+            kwargs["font"] = font
         return self._textbox.tag_config(tagName, **kwargs)
 
     def force_edit(self, new_text: list[FormattedString]):
@@ -141,7 +142,7 @@ def __main() -> None:
     pretty_textbox = CTkPrettyTextbox(app)
     pretty_textbox.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-    test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив;" \
+    test_string = "\t[m1][b][c]АББРАЙ [/c][/b][i]прил[/i]. дождливый, дождлив; " \
         "[b]че̄ххч ли аббрай[/b] осень \\[дождлива\\][/m]\n\t[m0]" \
         "[c red]•[/c][c green]•[/c][c yellow]•[/c][c blue]•[/c][/m]\n" \
         "\t[m1][b][c]аббрай[/c][/b] см. [b][ref]АББЬР[/ref][/b][/m]\n" \
