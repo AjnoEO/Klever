@@ -2,8 +2,8 @@
 
 import json
 import csv
-from convert_dict import convert
 import re
+from convert_dict import convert
 
 MAX_WEIGHT = 5
 
@@ -66,7 +66,7 @@ def __mixup_parser(string):
         if string[0] != "[":
             list_str.append(string[0])
             string = string[1:]
-        elif type_feature_string:= re.match(r"^\[([^\]]*?) (\d) : (.*[^\]])\]", string):
+        elif type_feature_string:= re.match(r"^\[([^\]]*?) (\d) : ([^\]]*?)\]", string):
             type_str, id_str, feature_str = type_feature_string.groups()
             list_str.append(Slot(type_str, id_str, feature_str))
             x = len(type_feature_string.group())
@@ -81,17 +81,17 @@ def __mixup_parser(string):
             list_str.append(Slot(type_str))
             x = len(type_feature_string.group())
             string = string[x:]
-    return (list_str)
+    return list_str
 
 with open('mix_ups/mix_ups.csv', encoding='utf8', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
     for row_dict in reader:
-        first_part = row_dict["Реальный"]
-        second_part = row_dict["Ложный"]
-        final_tuple = (__mixup_parser(first_part), __mixup_parser(second_part))
+        left_part = row_dict["Реальный"]
+        right_part = row_dict["Ложный"]
+        final_tuple = (__mixup_parser(left_part), __mixup_parser(right_part))
         mix_ups.append(final_tuple)
         if row_dict["Обратимо"] == "да":
-            final_tuple = (__mixup_parser(second_part), __mixup_parser(first_part))
+            final_tuple = (__mixup_parser(right_part), __mixup_parser(left_part))
             mix_ups.append(final_tuple)
 
 def __generate_possible_cores(segment_list: list[str | Slot]) -> list[str]:
