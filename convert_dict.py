@@ -8,6 +8,7 @@ def convert(list_of_dictionaries: list[dict]) -> None:
 	dict_words = {}
 	for dictionary in list_of_dictionaries:
 		with open(dictionary, "r", encoding='utf-16') as f:
+			source = dictionary
 			header = None
 			contents = ""
 			for line in f:
@@ -15,7 +16,7 @@ def convert(list_of_dictionaries: list[dict]) -> None:
 					if header:
 						dict_data = {
 							"contents": contents,
-							"source": dictionary
+							"source": source
 						}
 						dict_words[header].append(dict_data)
 						contents = ''
@@ -25,5 +26,7 @@ def convert(list_of_dictionaries: list[dict]) -> None:
 					dict_words.setdefault(header, [])
 				elif line[0] in '\t ':
 					contents += line
+				elif name_regex := re.match(r'^#NAME "(.+)"$', line):
+					source = name_regex.group(1)
 	with open ("klever_dict.json", "w", encoding='utf-8') as f:
 		json.dump(dict_words, f, indent = '\t', ensure_ascii=False)
