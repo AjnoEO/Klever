@@ -1,7 +1,9 @@
 """Разбирается в путаницах"""
 
 import json
+import csv
 from convert_dict import convert
+import re
 
 MAX_WEIGHT = 5
 
@@ -53,21 +55,44 @@ class Slot:
             list_of_segments = [global_mixup_dict[self.id]]
         return list_of_segments
 
-    def __str__(self) -> str:
-        return "Slot(" + self.type + ", " + str(self.id) + ")"
+    def __repr__(self) -> str:
+        return "Slot(" + str(self.type) + ")"
 
+mix_ups = []
 
-mix_ups = [
-    (["э"], ["ы"]),
-    (["н", "ҍ"], ["н", "ь"]),
-    (["д", "т"], ["д"]),
-    ([Slot("гласный")], ["ы"]),
-    ([Slot("согласный", 1), Slot("согласный", 2)], [Slot("согласный", 2), Slot("согласный", 1)]),
-    ([Slot("согласный", 1), Slot("согласный", 1)], [Slot("согласный", 1)]),
-    ([Slot("парный по звонкости взрывной", 1, "звонкий")], [Slot("парный по звонкости взрывной", 1, "глухой")])
-    #([Slot("согласный", "звонкий", 1), Slot("согласный", 1)], [Slot("согласный", 1)])
-]
+def __mixup_parser(string):
+    list_str = []
+    while string != "":
+        if string[0] != "[":
+            list_str.append(string[0])
+            string = string[1:]
+        elif type_feature_string:= re.match(r"^\[([^\]]*?) (\d) : (.*[^\]])\]", string):
+            type_str, id_str, feature_str = type_feature_string.groups()
+            list_str.append(Slot(type_str, id_str, feature_str))
+            x = len(type_feature_string.group())
+            string = string[x:]
+        elif type_feature_string:= re.match(r"^\[([^\]]*?) (\d)\]", string):
+            type_str, id_str = type_feature_string.groups()
+            list_str.append(Slot(type_str, id_str))
+            x = len(type_feature_string.group())
+            string = string[x:]
+        elif type_feature_string:= re.match(r"^\[([^\]]*?)\]", string):
+            type_str = type_feature_string.group(1)
+            list_str.append(Slot(type_str))
+            x = len(type_feature_string.group())
+            string = string[x:]
+    return (list_str)
 
+with open('mix_ups/mix_ups.csv', encoding='utf8', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row_dict in reader:
+        first_part = row_dict["Реальный"]
+        second_part = row_dict["Ложный"]
+        final_tuple = (__mixup_parser(first_part), __mixup_parser(second_part))
+        mix_ups.append(final_tuple)
+        if row_dict["Обратимо"] == "да":
+            final_tuple = (__mixup_parser(second_part), __mixup_parser(first_part))
+            mix_ups.append(final_tuple)
 
 def __generate_possible_cores(segment_list: list[str | Slot]) -> list[str]:
     # итоговый список ядер
