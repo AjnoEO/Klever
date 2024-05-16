@@ -24,6 +24,15 @@ with open('mix_ups/groups.json', encoding='utf8') as f:
         if isinstance(groups[type_gr][0], str):
             groups[type_gr] = set(groups[type_gr])
 
+with open('mix_ups/banned_sequences.json', encoding='utf8') as f:
+    banned_sequences = json.load(f)
+    NO_DOUBLE = banned_sequences["Не удваивать"]
+    if NO_DOUBLE == -1:
+        NO_DOUBLE = r"."
+    NO_TRIPLE = banned_sequences["Не утраивать"]
+    if NO_TRIPLE == -1:
+        NO_TRIPLE = r"."
+
 class Slot:
     """класс для слотов в путаницах"""
     def __init__(self, letter_type: str, segment_id: int | None = None, feature: str | None = None):
@@ -159,6 +168,10 @@ def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
     return list_of_mistakes
 
 def __apply_mixups(input_word: str, weight: int = 0) -> dict[str, int]:
+    if re.search(r"(" + NO_DOUBLE + r")\1", input_word): 
+        return {}
+    if re.search(r"(" + NO_TRIPLE + r")\1\1", input_word): 
+        return {}
     main_dict = {}
     if input_word in dict_words:
         main_dict[input_word] = weight
