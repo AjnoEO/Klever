@@ -5,7 +5,7 @@ import csv
 import re
 from convert_dict import convert
 
-MAX_WEIGHT = 5
+MAX_WEIGHT = 4
 
 list_of_dictionaries = [
     "dictionaries/sa-ru-antonova.dsl",
