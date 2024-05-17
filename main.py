@@ -6,7 +6,6 @@ import customtkinter_ext as cus_ext
 from mix_ups_parser import possible_words_from_input_word
 from utils import apply_arguments
 from markup_parser import parse_dsl
-from PIL import ImageTk
 
 with open("klever_dict.json", encoding="utf8") as f:
     dictionaries = json.load(f)
@@ -14,6 +13,7 @@ with open("klever_dict.json", encoding="utf8") as f:
 with open("info_about_dict.txt", encoding="utf8") as f:
     info_a = f.read()
 
+ICON_FILE = "ico.ico"
 
 class Letterpad(customtkinter.CTkFrame):
 
@@ -147,7 +147,7 @@ class WinAbout(customtkinter.CTkToplevel):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.maxsize(700, 383)
-        self.iconbitmap("ico1.ico")
+        self.iconbitmap(ICON_FILE)
 
         # информация о словаре
         self.info_about = cus_ext.CTkPrettyTextbox(self)
@@ -169,10 +169,7 @@ class App(customtkinter.CTk):
         self.grid_rowconfigure(1, weight=1)
         self.after(0, lambda: self.state("zoomed"))
         self.minsize(900, 500)
-        self.iconbitmap("ico1.ico")
-        # self.wm_iconbitmap("ico1.ico")
-        # icopath = ImageTk.PhotoImage(file=resource("ico1.ico"))
-        # self.iconphoto(True, icopath)
+        self.iconbitmap(ICON_FILE)
 
         # варианты
         self.possible_words = PossibleWords(self)
