@@ -5,8 +5,12 @@ import re
 import inspect
 from customtkinter_formatting_manager import Formatting, FormattedString
 from utils import apply_arguments
+import json
 
-TITLE_COLOR = "#274C77"
+with open("style.json", encoding="utf8") as f:
+    style = json.load(f)
+
+TITLE_COLOR = tuple(style["CTkText"]["heading_color"])
 
 
 def __split_dsl_to_tagged_list(

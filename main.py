@@ -13,6 +13,9 @@ with open("klever_dict.json", encoding="utf8") as f:
 with open("info_about_dict.txt", encoding="utf8") as f:
     info_a = f.read()
 
+with open("style.json", encoding="utf8") as f:
+    style = json.load(f)
+
 ICON_FILE = "ico.ico"
 
 class Letterpad(customtkinter.CTkFrame):
@@ -21,23 +24,25 @@ class Letterpad(customtkinter.CTkFrame):
         super().__init__(master)
 
         self.letters = ["ӓ", "ӭ", "һ", "ј", "ҋ", "ӆ", "ӎ", "ӊ", "ӈ", "ҏ", "ҍ", "¯̄"]
-
+        self.letter_buttons = []
         for i, letter in enumerate(self.letters):
             self.letter_button = customtkinter.CTkButton(
                 self,
                 text=letter[0],
-                command=apply_arguments(self.make_letter_button, letter[-1]),
+                command=apply_arguments(self.enter_letter, letter[-1]),
                 width=35,
                 height=35,
-                fg_color=("#80ED99", "#57CC99"),
-                hover_color=("#80ED99", "#38A3A5"),
-                border_color=("#FFFFFF", "#57CC99")
+                border_width=0,
+                fg_color="transparent",
+                hover_color=tuple(style["CTkButton_Letter"]["hover_color"]),
+                border_color=tuple(style["CTkButton_Letter"]["border_color"])
             )
             self.grid_columnconfigure(i, weight=1)
             self.letter_button.grid(row=0, column=i, padx=5, pady=5)
+            self.letter_buttons.append(self.letter_button)
 
-    def make_letter_button(self, letter):
-        self.master.entry.insert(len(self.master.entry.get()), letter)
+    def enter_letter(self, letter):
+        self.master.entry.insert(customtkinter.INSERT, letter)
 
 
 class SearchTools(customtkinter.CTkFrame):
@@ -57,17 +62,24 @@ class SearchTools(customtkinter.CTkFrame):
 
         # кнопка поиска
         self.button_search = customtkinter.CTkButton(
-            self, text="искать!", command=self.master.button_search_event
+            self,
+            text="искать!",
+            command=self.master.button_search_event,
+            width=35,
+            height=35,
+            fg_color=tuple(style["CTkButton_Search"]["fg_color"]),
+            hover_color=tuple(style["CTkButton_Search"]["hover_color"]),
+            border_color=tuple(style["CTkButton_Search"]["border_color"])
         )
         self.button_search.grid(row=0, column=1, sticky="ns", padx=(10, 10), pady=(0, 10))
 
         self.button_letterpad = customtkinter.CTkButton(
-            self, text="буквы", command=self.call_letterpad
+            self, text="буквы", command=self.call_letterpad, width=35, height=35
         )
         self.button_letterpad.grid(row=0, column=2, sticky="ns", padx=(10, 10), pady=(0, 10))
 
         # кнопка инфо
-        self.button_info = customtkinter.CTkButton(self, text="о проекте")
+        self.button_info = customtkinter.CTkButton(self, text="о проекте", width=35, height=35)
         self.button_info.grid(
             row=0, column=3, sticky="nsew", padx=(10, 10), pady=(0, 10)
         )
@@ -117,9 +129,10 @@ class PossibleWords(customtkinter.CTkFrame):
             word_button = customtkinter.CTkButton(
                 self,
                 text=word,
-                fg_color="#80ED99",
-                hover_color="#80ED99",
-                border_width=3,
+                fg_color="transparent",
+                hover_color=tuple(style["CTkButton_Word"]["hover_color"]),
+                border_color=tuple(style["CTkButton_Word"]["border_color"]),
+                border_width=0,
                 command=apply_arguments(self.display_article, word),
             )
             word_button.grid(row=i + 1, column=0, padx=10, pady=10, sticky="nesw")
@@ -150,7 +163,7 @@ class WinAbout(customtkinter.CTkToplevel):
         self.iconbitmap(ICON_FILE)
 
         # информация о словаре
-        self.info_about = cus_ext.CTkPrettyTextbox(self)
+        self.info_about = cus_ext.CTkPrettyTextbox(self, link_color=tuple(style["CTkText"]["link_color"]))
         self.info_about.grid(row=0, column=0, sticky="nesw", padx=20, pady=20)
         self.info_about.force_edit(parse_dsl(info_a))
 
@@ -182,7 +195,7 @@ class App(customtkinter.CTk):
         self.search_tools.configure(fg_color="transparent", border_width=0)
 
         # вывод
-        self.textbox = cus_ext.CTkPrettyTextbox(self)
+        self.textbox = cus_ext.CTkPrettyTextbox(self, link_color=tuple(style["CTkText"]["link_color"]))
         self.textbox.grid(
             row=1,
             column=1,

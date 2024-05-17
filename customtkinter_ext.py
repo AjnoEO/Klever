@@ -18,7 +18,7 @@ class InlineLinker:
         if isinstance(text_color, tuple):
             match customtkinter.get_appearance_mode():
                 case "Light": text_color = text_color[0]
-                case "Dark": text_color = text_color[1]
+                case "Dark": text_color = text_color[0]
         self.text.tag_config(
             "link",
             foreground = text_color,
