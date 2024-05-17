@@ -167,10 +167,17 @@ def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
             list_of_mistakes.append(new_word)
     return list_of_mistakes
 
+checked_words_dict = {} # словарь проверенных строк и веса, с которыми они были проверены
+
 def __apply_mixups(input_word: str, weight: int = 0) -> dict[str, int]:
-    if re.search(r"(" + NO_DOUBLE + r")\1", input_word): 
+    if weight == 0:
+        checked_words_dict.clear()
+    if input_word in checked_words_dict and weight >= checked_words_dict[input_word]:
         return {}
-    if re.search(r"(" + NO_TRIPLE + r")\1\1", input_word): 
+    checked_words_dict[input_word] = weight
+    if re.search(r"(" + NO_DOUBLE + r")\1", input_word):
+        return {}
+    if re.search(r"(" + NO_TRIPLE + r")\1\1", input_word):
         return {}
     main_dict = {}
     if input_word in dict_words:
@@ -194,4 +201,4 @@ def possible_words_from_input_word(input_word):
 
 
 if __name__ == "__main__":
-    print(possible_words_from_input_word (input()))
+    print(__apply_mixups(input()))
