@@ -28,7 +28,10 @@ class Letterpad(customtkinter.CTkFrame):
                 text=letter[0],
                 command=apply_arguments(self.make_letter_button, letter[-1]),
                 width=35,
-                height=35
+                height=35,
+                fg_color=("#80ED99", "#57CC99"),
+                hover_color=("#80ED99", "#38A3A5"),
+                border_color=("#FFFFFF", "#57CC99")
             )
             self.grid_columnconfigure(i, weight=1)
             self.letter_button.grid(row=0, column=i, padx=5, pady=5)
@@ -59,7 +62,7 @@ class SearchTools(customtkinter.CTkFrame):
         self.button_search.grid(row=0, column=1, sticky="ns", padx=(10, 10), pady=(0, 10))
 
         self.button_letterpad = customtkinter.CTkButton(
-            self, text="букви!", command=self.call_letterpad
+            self, text="буквы", command=self.call_letterpad
         )
         self.button_letterpad.grid(row=0, column=2, sticky="ns", padx=(10, 10), pady=(0, 10))
 
@@ -69,6 +72,14 @@ class SearchTools(customtkinter.CTkFrame):
             row=0, column=3, sticky="nsew", padx=(10, 10), pady=(0, 10)
         )
         self.button_info.bind("<ButtonRelease>", command=self.info)
+
+        # кнопка солнышка
+        self.button_theme = customtkinter.CTkButton(self, text="☾", width=35, height=35)
+        self.button_theme.grid(
+            row=0, column=4, sticky="nsew", padx=(10, 10), pady=(0, 10)
+        )
+        self.button_theme.bind("<ButtonRelease>", command=self.master.set_theme)
+
 
     def call_letterpad(self):
         if self.letterpad is None:
@@ -106,9 +117,9 @@ class PossibleWords(customtkinter.CTkFrame):
             word_button = customtkinter.CTkButton(
                 self,
                 text=word,
-                fg_color="#E7ECEF",
-                hover_color="#E7ECEF",
-                border_width=0,
+                fg_color="#80ED99",
+                hover_color="#80ED99",
+                border_width=3,
                 command=apply_arguments(self.display_article, word),
             )
             word_button.grid(row=i + 1, column=0, padx=10, pady=10, sticky="nesw")
@@ -145,8 +156,8 @@ class WinAbout(customtkinter.CTkToplevel):
 
 
 class App(customtkinter.CTk):
-    # customtkinter.FontManager.load_font("NunitoSans.ttf")
     customtkinter.set_default_color_theme("style.json")
+    customtkinter.set_appearance_mode("light")
 
     def __init__(self):
         super().__init__()
@@ -210,6 +221,14 @@ class App(customtkinter.CTk):
                     )
                 ]
             )
+
+    def set_theme(self, _=None):
+        if customtkinter.get_appearance_mode() == "Light":
+            customtkinter.set_appearance_mode("dark")
+            self.search_tools.button_theme.configure(text="☼")
+        else:
+            customtkinter.set_appearance_mode("light")
+            self.search_tools.button_theme.configure(text="☾")
 
 
 app = App()
