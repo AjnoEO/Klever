@@ -135,7 +135,7 @@ class WinAbout(customtkinter.CTkToplevel):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.maxsize(700, 383)
-        self.iconbitmap("ico1.ico")
+        self.iconbitmap("ico.ico")
 
         # информация о словаре
         self.info_about = cus_ext.CTkPrettyTextbox(self)
