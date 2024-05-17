@@ -6,7 +6,6 @@ import customtkinter_ext as cus_ext
 from mix_ups_parser import possible_words_from_input_word
 from utils import apply_arguments
 from markup_parser import parse_dsl
-from PIL import ImageTk
 
 with open("klever_dict.json", encoding="utf8") as f:
     dictionaries = json.load(f)
@@ -159,9 +158,6 @@ class App(customtkinter.CTk):
         self.after(0, lambda: self.state("zoomed"))
         self.minsize(900, 500)
         self.iconbitmap("ico1.ico")
-        # self.wm_iconbitmap("ico1.ico")
-        # icopath = ImageTk.PhotoImage(file=resource("ico1.ico"))
-        # self.iconphoto(True, icopath)
 
         # варианты
         self.possible_words = PossibleWords(self)
