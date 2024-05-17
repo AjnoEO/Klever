@@ -134,7 +134,8 @@ class WinAbout(customtkinter.CTkToplevel):
         self.geometry("700x505")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-        self.minsize(700, 500)
+        self.maxsize(700, 383)
+        self.iconbitmap("ico1.ico")
 
         # информация о словаре
         self.info_about = cus_ext.CTkPrettyTextbox(self)
@@ -156,6 +157,7 @@ class App(customtkinter.CTk):
         self.grid_rowconfigure(1, weight=1)
         self.after(0, lambda: self.state("zoomed"))
         self.minsize(900, 500)
+        self.iconbitmap("ico1.ico")
 
         # варианты
         self.possible_words = PossibleWords(self)
