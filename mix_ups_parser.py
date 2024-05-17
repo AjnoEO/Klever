@@ -189,6 +189,12 @@ def __apply_mixups(input_word: str, weight: int = 0) -> dict[str, int]:
         for mistaken_word in list_of_mistakes:
             aux_dict = __apply_mixups(mistaken_word, weight + 1)
             main_dict = aux_dict | main_dict
+            for element in aux_dict:
+                if element in main_dict:
+                    if aux_dict[element] < main_dict[element]:
+                        main_dict[element] = aux_dict[element]
+                else:
+                    main_dict[element] = aux_dict[element]
     return main_dict
 
 
@@ -201,4 +207,4 @@ def possible_words_from_input_word(input_word):
 
 
 if __name__ == "__main__":
-    print(__apply_mixups(input()))
+    print(possible_words_from_input_word(input()))

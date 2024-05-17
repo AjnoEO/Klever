@@ -11,10 +11,14 @@ class InlineLinker:
     """
     def __init__(self,
                  master,
-                 text_color: str | tuple[str, str] = "dark blue",
+                 text_color: str | tuple[str, str] = ("dark blue", "light blue"),
                  formatting: Formatting = Formatting.UNDERLINE):
         self.text: customtkinter.CTkTextbox = master
 
+        if isinstance(text_color, tuple):
+            match customtkinter.get_appearance_mode():
+                case "Light": text_color = text_color[0]
+                case "Dark": text_color = text_color[1]
         self.text.tag_config(
             "link",
             foreground = text_color,
@@ -95,10 +99,11 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
     """
     Textbox с более простой настройкой текста и с ссылками с настраиваемыми действиями
     """
-    def __init__(self, master: any, **kwargs):
+    def __init__(self, master: any, link_color: str | tuple[str, str] | None = None, **kwargs):
         super().__init__(master, **kwargs)
         self.configure(wrap=customtkinter.WORD)
         self.configure(state=customtkinter.DISABLED)
+        self.link_color = link_color
         self.linker = None
         self.formatter = None
 
@@ -116,7 +121,7 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
         """
         self.configure(state = customtkinter.NORMAL)
         self.delete("0.0", "end")
-        self.linker = InlineLinker(self)
+        self.linker = InlineLinker(self, text_color=self.link_color) if self.link_color else InlineLinker(self)
         self.formatter = Formatter(self)
         self._pretty_insert("end", new_text)
         self.configure(state = customtkinter.DISABLED)
