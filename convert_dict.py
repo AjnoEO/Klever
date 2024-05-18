@@ -3,6 +3,7 @@
 import json
 import re
 
+
 def convert(list_of_dictionaries: list[dict]) -> None:
 	"""Конвертирует словари в формат словаря Klever и сохраняет в klever_dict.json"""
 	dict_words = {}
@@ -28,5 +29,5 @@ def convert(list_of_dictionaries: list[dict]) -> None:
 					contents += line
 				elif name_regex := re.match(r'^#NAME "(.+)"$', line):
 					source = name_regex.group(1)
-	with open ("klever_dict.json", "w", encoding='utf-8') as f:
-		json.dump(dict_words, f, indent = '\t', ensure_ascii=False)
+	with open("klever_dict.json", "w", encoding='utf-8') as f:
+		json.dump(dict_words, f, indent='\t', ensure_ascii=False)

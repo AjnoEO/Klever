@@ -21,8 +21,8 @@ class InlineLinker:
                 case "Dark": text_color = text_color[1]
         self.text.tag_config(
             "link",
-            foreground = text_color,
-            underline = 1 if Formatting.UNDERLINE in formatting else 0
+            foreground=text_color,
+            underline=1 if Formatting.UNDERLINE in formatting else 0
         )
         self.text.tag_bind("link", "<Enter>", self._enter)
         self.text.tag_bind("link", "<Leave>", self._leave)
@@ -65,9 +65,9 @@ class Formatter:
         self.font_family = self.text._font._family
         self.font_size = self.text._font._size
         self.text.tag_config(str(Formatting.BOLD), font=customtkinter.CTkFont(weight='bold'))
-        #self.text.tag_config("bold", font=(self.font_family, self.font_size, "bold"))
+        # self.text.tag_config("bold", font=(self.font_family, self.font_size, "bold"))
         self.text.tag_config(str(Formatting.ITALIC), font=customtkinter.CTkFont(slant='italic'))
-        #self.text.tag_config("italic", font=(self.font_family, self.font_size, "italic"))
+        # self.text.tag_config("italic", font=(self.font_family, self.font_size, "italic"))
 
         self.text.tag_config(str(Formatting.UNDERLINE), underline=1)
         self.text.tag_config(str(Formatting.OVERSTRIKE), overstrike=1)
@@ -126,23 +126,24 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
         """
         Заменить весь текст на `new_text`
         """
-        self.configure(state = customtkinter.NORMAL)
+        self.configure(state=customtkinter.NORMAL)
         self.delete("0.0", "end")
         self.linker = InlineLinker(self, text_color=self.link_color) if self.link_color else InlineLinker(self)
         self.formatter = Formatter(self)
         self._pretty_insert("end", new_text)
-        self.configure(state = customtkinter.DISABLED)
+        self.configure(state=customtkinter.DISABLED)
 
     def _pretty_insert(self, index: str, text: list[FormattedString], tags: None = None):
         index = index.lower()
         for substring in text:
             self.insert(index, substring.string,
-                        (self.linker.add(substring.on_click) if substring.on_click else ()) \
-                        + self.formatter.add(substring.color, substring.formatting) \
+                        (self.linker.add(substring.on_click) if substring.on_click else ())
+                        + self.formatter.add(substring.color, substring.formatting)
                         + (tags if tags else ())
                         )
             if not index.endswith("end"):
                 index += f" + {len(substring.string)} chars"
+
 
 def __main() -> None:
     app = customtkinter.CTk()
@@ -166,8 +167,10 @@ def __main() -> None:
 
     app.mainloop()
 
+
 def __on_click(text: str):
     print(f"Нажата REF-ссылка: {text}")
+
 
 if __name__ == "__main__":
     __main()

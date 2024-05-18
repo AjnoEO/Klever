@@ -18,6 +18,7 @@ with open("style.json", encoding="utf8") as f:
 
 ICON_FILE = "ico.ico"
 
+
 class Letterpad(customtkinter.CTkFrame):
 
     def __init__(self, master):
@@ -91,7 +92,6 @@ class SearchTools(customtkinter.CTkFrame):
             row=0, column=4, sticky="nsew", padx=(10, 10), pady=(0, 10)
         )
         self.button_theme.bind("<ButtonRelease>", command=self.master.set_theme)
-
 
     def call_letterpad(self):
         if self.letterpad is None:
@@ -227,7 +227,8 @@ class App(customtkinter.CTk):
             self.textbox.force_edit(
                 [
                     cus_ext.FormattedString(
-                        f"\"{self.search_tools.what_enterred().lower().strip()}\" очень старалось, но в словарях не нашлось :("
+                        f"\"{self.search_tools.what_enterred().lower().strip()}\" очень старалось,"
+                        f" но в словарях не нашлось :("
                     )
                 ]
             )

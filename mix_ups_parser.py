@@ -33,6 +33,7 @@ with open('mix_ups/banned_sequences.json', encoding='utf8') as f:
     if NO_TRIPLE == -1:
         NO_TRIPLE = r"."
 
+
 class Slot:
     """класс для слотов в путаницах"""
     def __init__(self, letter_type: str, segment_id: int | None = None, feature: str | None = None):
@@ -67,7 +68,9 @@ class Slot:
     def __repr__(self) -> str:
         return "Slot(" + str(self.type) + ")"
 
+
 mix_ups = []
+
 
 def __mixup_parser(string):
     list_str = []
@@ -75,22 +78,23 @@ def __mixup_parser(string):
         if string[0] != "[":
             list_str.append(string[0])
             string = string[1:]
-        elif type_feature_string:= re.match(r"^\[([^\]]*?) (\d) : ([^\]]*?)\]", string):
+        elif type_feature_string := re.match(r"^\[([^\]]*?) (\d) : ([^\]]*?)\]", string):
             type_str, id_str, feature_str = type_feature_string.groups()
             list_str.append(Slot(type_str, id_str, feature_str))
             x = len(type_feature_string.group())
             string = string[x:]
-        elif type_feature_string:= re.match(r"^\[([^\]]*?) (\d)\]", string):
+        elif type_feature_string := re.match(r"^\[([^\]]*?) (\d)\]", string):
             type_str, id_str = type_feature_string.groups()
             list_str.append(Slot(type_str, id_str))
             x = len(type_feature_string.group())
             string = string[x:]
-        elif type_feature_string:= re.match(r"^\[([^\]]*?)\]", string):
+        elif type_feature_string := re.match(r"^\[([^\]]*?)\]", string):
             type_str = type_feature_string.group(1)
             list_str.append(Slot(type_str))
             x = len(type_feature_string.group())
             string = string[x:]
     return list_str
+
 
 with open('mix_ups/mix_ups.csv', encoding='utf8', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
@@ -102,6 +106,7 @@ with open('mix_ups/mix_ups.csv', encoding='utf8', newline='') as csvfile:
         if row_dict["Обратимо"] == "да":
             final_tuple = (__mixup_parser(right_part), __mixup_parser(left_part))
             mix_ups.append(final_tuple)
+
 
 def __generate_possible_cores(segment_list: list[str | Slot]) -> list[str]:
     # итоговый список ядер
@@ -160,14 +165,16 @@ def __results_of_mixup(input_word: str, mix_up: tuple[list, list]) -> list[str]:
         if not is_match:
             continue
         prefix = input_word[:index]
-        suffix = input_word[index + length :]
+        suffix = input_word[index + length:]
         possible_cores = __generate_possible_cores(mix_up[0])
         for core in possible_cores:
             new_word = prefix + core + suffix
             list_of_mistakes.append(new_word)
     return list_of_mistakes
 
-checked_words_dict = {} # словарь проверенных строк и веса, с которыми они были проверены
+
+checked_words_dict = {}  # словарь проверенных строк и веса, с которыми они были проверены
+
 
 def __apply_mixups(input_word: str, weight: int = 0) -> dict[str, int]:
     if weight == 0:
