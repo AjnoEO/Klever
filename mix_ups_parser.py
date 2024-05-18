@@ -61,6 +61,9 @@ class Slot:
             list_of_segments = list(aux_set)
         if (self.id is not None) and (self.feature is not None):
             list_of_segments = [global_mixup_dict[self.id][self.feature]]
+        elif (self.id is None) and (self.feature is not None):
+            for feat_part in groups[self.type]:
+                list_of_segments.append(feat_part[self.feature])
         elif self.id is not None:
             list_of_segments = [global_mixup_dict[self.id]]
         return list_of_segments
@@ -81,6 +84,11 @@ def __mixup_parser(string):
         elif type_feature_string := re.match(r"^\[([^\]]*?) (\d) : ([^\]]*?)\]", string):
             type_str, id_str, feature_str = type_feature_string.groups()
             list_str.append(Slot(type_str, id_str, feature_str))
+            x = len(type_feature_string.group())
+            string = string[x:]
+        elif type_feature_string := re.match(r"^\[([^\]]*?) : ([^\]]*?)\]", string):
+            type_str, feature_str = type_feature_string.groups()
+            list_str.append(Slot(type_str, feature=feature_str))
             x = len(type_feature_string.group())
             string = string[x:]
         elif type_feature_string := re.match(r"^\[([^\]]*?) (\d)\]", string):
