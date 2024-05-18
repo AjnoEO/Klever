@@ -18,7 +18,7 @@ class InlineLinker:
         if isinstance(text_color, tuple):
             match customtkinter.get_appearance_mode():
                 case "Light": text_color = text_color[0]
-                case "Dark": text_color = text_color[0]
+                case "Dark": text_color = text_color[1]
         self.text.tag_config(
             "link",
             foreground = text_color,
@@ -72,7 +72,7 @@ class Formatter:
         self.text.tag_config(str(Formatting.UNDERLINE), underline=1)
         self.text.tag_config(str(Formatting.OVERSTRIKE), overstrike=1)
 
-    def add(self, color: str | None = None, formatting: Formatting | None = None) -> tuple[str]:
+    def add(self, color: str | tuple[str, str] | None = None, formatting: Formatting | None = None) -> tuple[str]:
         """Создать нужные тэги форматирования и вернуть кортеж с ними
 
         :param color: цвет текста, None по умолчанию
@@ -113,6 +113,13 @@ class CTkPrettyTextbox(customtkinter.CTkTextbox):
             if isinstance(font, customtkinter.CTkFont):
                 font = self._apply_font_scaling(font)
             kwargs["font"] = font
+        if "foreground" in kwargs:
+            color = kwargs["foreground"]
+            if isinstance(color, tuple):
+                match customtkinter.get_appearance_mode():
+                    case "Light": color = color[0]
+                    case "Dark": color = color[1]
+            kwargs["foreground"] = color
         return self._textbox.tag_config(tagName, **kwargs)
 
     def force_edit(self, new_text: list[FormattedString]):
