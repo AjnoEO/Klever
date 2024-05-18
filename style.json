@@ -176,8 +176,8 @@
     "text_color": ["black", "#FFFFFF"]
   },
   "CTkText": {
-    "heading_color": ["#78c2a2"],
-    "link_color": ["#789ac2"]
+    "heading_color": ["#57cc99", "#78c2a2"],
+    "link_color": ["#7890cd", "#789ac2"]
   },
   "CTkFont": {
     "macOS": {
